@@ -1,29 +1,15 @@
-const mongoose = require("mongoose");
-const userSchema = new mongoose.Schema({
-    username: {type: String},
-    password: String,
-    purchasedCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }]
-  });
-  
-const adminSchema = new mongoose.Schema({
-    username: String,
-    password: String
-  });
-  
-const courseSchema = new mongoose.Schema({
-    title: String,
-    description: String,
-    price: Number,
-    imageLink: String,
-    published: Boolean
-  });
+const { PrismaClient } = require('@prisma/client');
+const { PrismaPg } = require('@prisma/adapter-pg');
+const { Pool } = require('pg');
 
-const User = mongoose.model('User', userSchema);
-const Admin = mongoose.model('Admin', adminSchema);
-const Course = mongoose.model('Course', courseSchema);
-  
-  module.exports = {
-    User,
-    Admin,
-    Course
-  }
+// Use dotenv if not already loaded by prisma config
+require('dotenv').config();
+
+const connectionString = process.env.DATABASE_URL || 'postgresql://root:password@localhost:5432/courses';
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
+
+module.exports = {
+  prisma,
+};
